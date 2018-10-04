@@ -1,9 +1,4 @@
-{{#alacarte}}
-const nodeExternals = require('webpack-node-externals')
-const resolve = (dir) => require('path').join(__dirname, dir)
-{{/alacarte}}
-
-module.exports = {
+export default {
   /*
   ** Headers of the page
   */
@@ -32,26 +27,24 @@ module.exports = {
   */
   build: {
     {{#alacarte}}
+    transpile: [/^vuetify/],
     babel: {
       plugins: [
-        ["transform-imports", {
-          "vuetify": {
-            "transform": "vuetify/es5/components/${member}",
-            "preventFullImport": true
+        ['transform-imports', {
+          'vuetify': {
+            'transform': 'vuetify/es5/components/${member}',
+            'preventFullImport': true
           }
         }]
       ]
     },
     {{/alacarte}}
-    vendor: [
-      '~/plugins/vuetify.js'
-    ],
     extractCSS: true,
     /*
     ** Run ESLint on save
     */
-    extend (config, ctx) {
-      if (ctx.isDev && ctx.isClient) {
+    extend (config, {isDev}) {
+      if (isDev && process.client) {
         config.module.rules.push({
           enforce: 'pre',
           test: /\.(js|vue)$/,
@@ -60,7 +53,7 @@ module.exports = {
         })
       }
       {{#alacarte}}
-      if (ctx.isServer) {
+      if (process.server) {
         config.externals = [
           nodeExternals({
             whitelist: [/^vuetify/]
